@@ -52,3 +52,21 @@ def new_movies(request):
         return JsonResponse({'success':False,'data':{'ERROR':'MovieError','DESCRIPTION':'Somthing wrong in movie object creation.'}})
     return JsonResponse({'success':True,'data':'New movie added successfully'})
 
+# top-rated-movies
+@api_view(['GET'])
+def top_rated_movies(request):
+    movies =  Rating.objects.filter(averageReting__gte=6.0).values('averageReting', 'movies__tconst', 'movies__primaryTitle', 'movies__genres')
+    allmovies = []
+    print(movies)
+    for movie in movies:
+        u = {
+            'tconst' : movie['movies__tconst'],
+            'primaryTitle' : movie['movies__primaryTitle'],
+            'averageRating' : movie['averageReting'],
+            'genres' : movie['movies__genres']
+        }
+        allmovies.append(u)
+    
+    data = {'movieList': allmovies}
+    res = {'success':True, 'data':data}
+    return JsonResponse(res, safe=True)
